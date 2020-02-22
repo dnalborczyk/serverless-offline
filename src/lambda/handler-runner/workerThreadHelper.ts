@@ -1,4 +1,4 @@
-import { parentPort, workerData } from 'worker_threads' // eslint-disable-line import/no-unresolved
+import { parentPort, workerData } from 'worker_threads'
 import InProcessRunner from './InProcessRunner'
 
 const { functionKey, handlerName, handlerPath } = workerData
