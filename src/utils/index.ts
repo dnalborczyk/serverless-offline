@@ -1,8 +1,6 @@
 const { isArray } = Array
 const { keys } = Object
 
-export * from './detectExecutable.js'
-
 export { default as createApiKey } from './createApiKey'
 export { default as createUniqueId } from './createUniqueId'
 export { default as formatToClfTime } from './formatToClfTime'

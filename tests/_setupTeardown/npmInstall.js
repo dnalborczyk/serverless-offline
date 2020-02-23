@@ -1,10 +1,6 @@
 import { resolve } from 'path'
 import execa from 'execa'
-import {
-  detectPython2,
-  detectPython3,
-  detectRuby,
-} from '../../src/utils/detectExecutable.js'
+import { detectPython2, detectPython3, detectRuby } from './detectExecutable.js'
 
 export default async function npmInstall() {
   const [python2, python3, ruby] = await Promise.all([
