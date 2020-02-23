@@ -11,9 +11,6 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js'],
   modulePathIgnorePatterns: ['src/lambda/__tests__/fixtures/'],
   setupFiles: ['object.fromentries/auto.js'],
-  transform: {
-    '^.+\\.(js|ts)?$': 'ts-jest',
-  },
   transformIgnorePatterns: ['/node_modules/'],
 }
 
