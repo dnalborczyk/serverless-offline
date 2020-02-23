@@ -6,7 +6,7 @@
   "main": "dist/main.js",
   "type": "commonjs",
   "scripts": {
-    "build": "rimraf dist && babel --extensions .js,.ts src --out-dir dist --ignore **/__tests__  && copyfiles -u 1 \"src/**/*.{vm,py,rb}\" dist",
+    "build": "rimraf dist && npm run typecheck && babel --extensions .js,.ts src --out-dir dist --ignore **/__tests__  && copyfiles -u 1 \"src/**/*.{vm,py,rb}\" dist",
     "build:tsc": "rimraf dist && tsc && copyfiles -u 1 \"src/**/*.{vm,py,rb}\" dist",
     "typecheck": "tsc --noEmit",
     "genTypes": "tsc --emitDeclarationOnly --declarationMap",
