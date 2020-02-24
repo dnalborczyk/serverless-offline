@@ -18,17 +18,17 @@ import Lambda from '../../lambda/index'
 const { parse, stringify } = JSON
 
 export default class WebSocketClients {
-  private readonly _clients: Map<string, WebSocket> &
+  readonly #clients: Map<string, WebSocket> &
     Map<WebSocket, string> = new Map()
-  private readonly _lambda: Lambda
-  private readonly _options: Options
-  private readonly _webSocketRoutes: Map<string, any> = new Map()
-  private readonly _websocketsApiRouteSelectionExpression: string
+  readonly #lambda: Lambda
+  readonly #options: Options
+  readonly #webSocketRoutes: Map<string, any> = new Map()
+  readonly #websocketsApiRouteSelectionExpression: string
 
   constructor(serverless: Serverless, options: Options, lambda: Lambda) {
-    this._lambda = lambda
-    this._options = options
-    this._websocketsApiRouteSelectionExpression =
+    this.#lambda = lambda
+    this.#options = options
+    this.#websocketsApiRouteSelectionExpression =
       // @ts-ignore
       serverless.service.provider.websocketsApiRouteSelectionExpression ||
       DEFAULT_WEBSOCKETS_API_ROUTE_SELECTION_EXPRESSION
@@ -38,21 +38,21 @@ export default class WebSocketClients {
     webSocketClient: WebSocket,
     connectionId: string,
   ) {
-    this._clients.set(webSocketClient, connectionId)
-    this._clients.set(connectionId, webSocketClient)
+    this.#clients.set(webSocketClient, connectionId)
+    this.#clients.set(connectionId, webSocketClient)
   }
 
   private _removeWebSocketClient(webSocketClient: WebSocket) {
-    const connectionId = this._clients.get(webSocketClient)
+    const connectionId = this.#clients.get(webSocketClient)
 
-    this._clients.delete(webSocketClient)
-    this._clients.delete(connectionId)
+    this.#clients.delete(webSocketClient)
+    this.#clients.delete(connectionId)
 
     return connectionId
   }
 
   private _getWebSocketClient(connectionId: string) {
-    return this._clients.get(connectionId)
+    return this.#clients.get(connectionId)
   }
 
   private async _processEvent(
@@ -61,10 +61,10 @@ export default class WebSocketClients {
     route: string,
     event,
   ) {
-    let functionKey = this._webSocketRoutes.get(route)
+    let functionKey = this.#webSocketRoutes.get(route)
 
     if (!functionKey && route !== '$connect' && route !== '$disconnect') {
-      functionKey = this._webSocketRoutes.get('$default')
+      functionKey = this.#webSocketRoutes.get('$default')
     }
 
     if (!functionKey) {
@@ -90,7 +90,7 @@ export default class WebSocketClients {
       debugLog(`Error in route handler '${functionKey}'`, err)
     }
 
-    const lambdaFunction = this._lambda.get(functionKey)
+    const lambdaFunction = this.#lambda.get(functionKey)
 
     lambdaFunction.setEvent(event)
 
@@ -115,7 +115,7 @@ export default class WebSocketClients {
       return DEFAULT_WEBSOCKETS_ROUTE
     }
 
-    const routeSelectionExpression = this._websocketsApiRouteSelectionExpression.replace(
+    const routeSelectionExpression = this.#websocketsApiRouteSelectionExpression.replace(
       'request.body',
       '',
     )
@@ -135,7 +135,7 @@ export default class WebSocketClients {
     const connectEvent = new WebSocketConnectEvent(
       connectionId,
       request,
-      this._options,
+      this.#options,
     ).create()
 
     this._processEvent(webSocketClient, connectionId, '$connect', connectEvent)
@@ -172,7 +172,7 @@ export default class WebSocketClients {
 
   addRoute(functionKey: string, route: string) {
     // set the route name
-    this._webSocketRoutes.set(route, functionKey)
+    this.#webSocketRoutes.set(route, functionKey)
 
     serverlessLog(`route '${route}'`)
   }

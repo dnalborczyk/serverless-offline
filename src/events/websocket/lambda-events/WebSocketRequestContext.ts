@@ -5,14 +5,14 @@ const { now } = Date
 type EventType = 'CONNECT' | 'DISCONNECT' | 'MESSAGE'
 
 export default class WebSocketRequestContext {
-  private readonly _connectionId: string
-  private readonly _eventType: EventType
-  private readonly _route: string
+  readonly #connectionId: string
+  readonly #eventType: EventType
+  readonly #route: string
 
   constructor(eventType: EventType, route: string, connectionId: string) {
-    this._connectionId = connectionId
-    this._eventType = eventType
-    this._route = route
+    this.#connectionId = connectionId
+    this.#eventType = eventType
+    this.#route = route
   }
 
   create() {
@@ -21,9 +21,9 @@ export default class WebSocketRequestContext {
     const requestContext = {
       apiId: 'private',
       connectedAt: now(), // TODO this is probably not correct, and should be the initial connection time?
-      connectionId: this._connectionId,
+      connectionId: this.#connectionId,
       domainName: 'localhost',
-      eventType: this._eventType,
+      eventType: this.#eventType,
       extendedRequestId: createUniqueId(),
       identity: {
         accessKey: null,
@@ -44,7 +44,7 @@ export default class WebSocketRequestContext {
       requestId: createUniqueId(),
       requestTime: formatToClfTime(timeEpoch),
       requestTimeEpoch: timeEpoch,
-      routeKey: this._route,
+      routeKey: this.#route,
       stage: 'local',
     }
 

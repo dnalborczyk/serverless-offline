@@ -24,12 +24,12 @@ function getResponseContentType(fep) {
 }
 
 export default class Endpoint {
-  private readonly _handlerPath: string
-  private readonly _http: any
+  readonly #handlerPath: string
+  readonly #http: any
 
   constructor(handlerPath: string, http) {
-    this._handlerPath = handlerPath
-    this._http = http
+    this.#handlerPath = handlerPath
+    this.#http = http
 
     return this._generate()
   }
@@ -43,14 +43,14 @@ export default class Endpoint {
 
     try {
       // determine request template override
-      const reqFilename = `${this._handlerPath}.req.vm`
+      const reqFilename = `${this.#handlerPath}.req.vm`
 
       // check if serverless framework populates the object itself
       if (
-        typeof this._http.request === 'object' &&
-        typeof this._http.request.template === 'object'
+        typeof this.#http.request === 'object' &&
+        typeof this.#http.request.template === 'object'
       ) {
-        const templatesConfig = this._http.request.template
+        const templatesConfig = this.#http.request.template
 
         Object.keys(templatesConfig).forEach((key) => {
           fep.requestTemplates[key] = templatesConfig[key]
@@ -64,7 +64,7 @@ export default class Endpoint {
       }
 
       // determine response template
-      const resFilename = `${this._handlerPath}.res.vm`
+      const resFilename = `${this.#handlerPath}.res.vm`
 
       fep.responseContentType = getResponseContentType(fep)
       debugLog('Response Content-Type ', fep.responseContentType)
@@ -95,10 +95,10 @@ export default class Endpoint {
 
     const fullEndpoint = {
       ...offlineEndpoint,
-      ...this._http,
+      ...this.#http,
     }
 
-    if (this._http.integration === 'lambda') {
+    if (this.#http.integration === 'lambda') {
       // determine request and response templates or use defaults
       return this._setVmTemplates(fullEndpoint)
     }

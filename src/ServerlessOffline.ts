@@ -19,22 +19,22 @@ import WebSocket from './events/websocket/index'
 import { CliOptions, Options } from './types'
 
 export default class ServerlessOffline implements Plugin {
-  private _http: Http | undefined
-  private _schedule: Schedule | undefined
-  private _webSocket: WebSocket | undefined
-  private _lambda: Lambda | undefined
+  #http: Http | undefined
+  #schedule: Schedule | undefined
+  #webSocket: WebSocket | undefined
+  #lambda: Lambda | undefined
 
-  private _options: Options | undefined
+  #options: Options | undefined
 
-  private readonly _cliOptions: CliOptions
-  private readonly _serverless: Serverless
+  readonly #cliOptions: CliOptions
+  readonly #serverless: Serverless
 
   commands: Plugin.Commands
   hooks: Plugin.Hooks
 
   constructor(serverless: Serverless, cliOptions: CliOptions) {
-    this._cliOptions = cliOptions
-    this._serverless = serverless
+    this.#cliOptions = cliOptions
+    this.#serverless = serverless
 
     // @ts-ignore
     setLog((...args) => serverless.cli.log(...args))
@@ -120,21 +120,21 @@ export default class ServerlessOffline implements Plugin {
 
     const eventModules = []
 
-    if (this._lambda) {
-      eventModules.push(this._lambda.cleanup())
-      eventModules.push(this._lambda.stop(SERVER_SHUTDOWN_TIMEOUT))
+    if (this.#lambda) {
+      eventModules.push(this.#lambda.cleanup())
+      eventModules.push(this.#lambda.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
-    if (this._http) {
-      eventModules.push(this._http.stop(SERVER_SHUTDOWN_TIMEOUT))
+    if (this.#http) {
+      eventModules.push(this.#http.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
-    // if (this._schedule) {
-    //   eventModules.push(this._schedule.stop())
+    // if (this.#schedule) {
+    //   eventModules.push(this.#schedule.stop())
     // }
 
-    if (this._webSocket) {
-      eventModules.push(this._webSocket.stop(SERVER_SHUTDOWN_TIMEOUT))
+    if (this.#webSocket) {
+      eventModules.push(this.#webSocket.stop(SERVER_SHUTDOWN_TIMEOUT))
     }
 
     await Promise.all(eventModules)
@@ -173,14 +173,14 @@ export default class ServerlessOffline implements Plugin {
   async _createLambda(lambdas, skipStart?: boolean) {
     const { default: Lambda } = await import('./lambda/index')
 
-    this._lambda = new Lambda(this._serverless, this._options)
+    this.#lambda = new Lambda(this.#serverless, this.#options)
 
     lambdas.forEach(({ functionKey, functionDefinition }) => {
-      this._lambda.add(functionKey, functionDefinition)
+      this.#lambda.add(functionKey, functionDefinition)
     })
 
     if (!skipStart) {
-      await this._lambda.start()
+      await this.#lambda.start()
     }
   }
 
@@ -188,110 +188,110 @@ export default class ServerlessOffline implements Plugin {
   async _createHttp(events, skipStart?: boolean) {
     const { default: Http } = await import('./events/http/index')
 
-    this._http = new Http(this._serverless, this._options, this._lambda)
+    this.#http = new Http(this.#serverless, this.#options, this.#lambda)
 
-    await this._http.registerPlugins()
+    await this.#http.registerPlugins()
 
     events.forEach(({ functionKey, handler, http }) => {
-      this._http.createEvent(functionKey, http, handler)
+      this.#http.createEvent(functionKey, http, handler)
     })
 
     // HTTP Proxy defined in Resource
-    this._http.createResourceRoutes()
+    this.#http.createResourceRoutes()
 
     // Not found handling
     // we have to create the 404 routes last, otherwise we could have
     // collisions with catch all routes, e.g. any (proxy+}
-    this._http.create404Route()
+    this.#http.create404Route()
 
     if (!skipStart) {
-      await this._http.start()
+      await this.#http.start()
     }
   }
 
   private async _createSchedule(events) {
     const { default: Schedule } = await import('./events/schedule/index')
 
-    this._schedule = new Schedule(this._lambda)
+    this.#schedule = new Schedule(this.#lambda)
 
     events.forEach(({ functionKey, schedule }) => {
-      this._schedule.createEvent(functionKey, schedule)
+      this.#schedule.createEvent(functionKey, schedule)
     })
   }
 
   private async _createWebSocket(events) {
     const { default: WebSocket } = await import('./events/websocket/index')
 
-    this._webSocket = new WebSocket(
-      this._serverless,
-      this._options,
-      this._lambda,
+    this.#webSocket = new WebSocket(
+      this.#serverless,
+      this.#options,
+      this.#lambda,
     )
 
     events.forEach(({ functionKey, websocket }) => {
-      this._webSocket.createEvent(functionKey, websocket)
+      this.#webSocket.createEvent(functionKey, websocket)
     })
 
-    return this._webSocket.start()
+    return this.#webSocket.start()
   }
 
   _mergeOptions() {
-    const { service } = this._serverless
+    const { service } = this.#serverless
 
     // custom options
     const { [CUSTOM_OPTION]: customOptions } = service.custom || {}
 
     // merge options
     // order of Precedence: command line options, custom options, defaults.
-    this._options = {
+    this.#options = {
       ...defaultOptions,
       ...customOptions,
-      ...this._cliOptions,
+      ...this.#cliOptions,
     }
 
     // Parse CORS options
     // @ts-ignore
-    this._options.corsAllowHeaders = this._options.corsAllowHeaders
+    this.#options.corsAllowHeaders = this.#options.corsAllowHeaders
       .replace(/\s/g, '')
       .split(',')
     // @ts-ignore
-    this._options.corsAllowOrigin = this._options.corsAllowOrigin
+    this.#options.corsAllowOrigin = this.#options.corsAllowOrigin
       .replace(/\s/g, '')
       .split(',')
     // @ts-ignore
-    this._options.corsExposedHeaders = this._options.corsExposedHeaders
+    this.#options.corsExposedHeaders = this.#options.corsExposedHeaders
       .replace(/\s/g, '')
       .split(',')
 
     // @ts-ignore
-    if (this._options.corsDisallowCredentials) {
-      this._options.corsAllowCredentials = false
+    if (this.#options.corsDisallowCredentials) {
+      this.#options.corsAllowCredentials = false
     }
 
     // @ts-ignore
-    this._options.corsConfig = {
-      credentials: this._options.corsAllowCredentials,
-      exposedHeaders: this._options.corsExposedHeaders,
-      headers: this._options.corsAllowHeaders,
-      origin: this._options.corsAllowOrigin,
+    this.#options.corsConfig = {
+      credentials: this.#options.corsAllowCredentials,
+      exposedHeaders: this.#options.corsExposedHeaders,
+      headers: this.#options.corsAllowHeaders,
+      origin: this.#options.corsAllowOrigin,
     }
 
     serverlessLog(
       `Starting Offline: ${service.provider.stage}/${service.provider.region}.`,
     )
-    debugLog('options:', this._options)
+    debugLog('options:', this.#options)
   }
 
   // TODO FIXME use "private" access modifier
   _getEvents() {
-    const { service } = this._serverless
+    const { service } = this.#serverless
 
     // for simple API Key authentication model
     // @ts-ignore TODO FIX typescript definitions
     if (service.provider.apiKeys) {
-      serverlessLog(`Key with token: ${this._options.apiKey}`)
+      serverlessLog(`Key with token: ${this.#options.apiKey}`)
 
-      if (this._options.noAuth) {
+      if (this.#options.noAuth) {
         serverlessLog(
           'Authorizers are turned off. You do not need to use x-api-key header.',
         )
@@ -347,12 +347,12 @@ export default class ServerlessOffline implements Plugin {
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
   getApiGatewayServer() {
-    return this._http.getServer()
+    return this.#http.getServer()
   }
 
   // TODO: missing tests
   private _verifyServerlessVersionCompatibility() {
-    const currentVersion = this._serverless.version
+    const currentVersion = this.#serverless.version
 
     const requiredVersionRange = pkg.peerDependencies.serverless
 

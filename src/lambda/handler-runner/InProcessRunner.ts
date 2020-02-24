@@ -5,10 +5,10 @@ const { assign } = Object
 
 export default class InProcessRunner implements Runner {
   private readonly _env: NodeJS.ProcessEnv
-  private readonly _functionKey: string
-  private readonly _handlerName: string
-  private readonly _handlerPath: string
-  private readonly _timeout: number
+  readonly #functionKey: string
+  readonly #handlerName: string
+  readonly #handlerPath: string
+  readonly #timeout: number
 
   constructor(
     functionKey: string,
@@ -18,10 +18,10 @@ export default class InProcessRunner implements Runner {
     timeout: number,
   ) {
     this._env = env
-    this._functionKey = functionKey
-    this._handlerName = handlerName
-    this._handlerPath = handlerPath
-    this._timeout = timeout
+    this.#functionKey = functionKey
+    this.#handlerName = handlerName
+    this.#handlerPath = handlerPath
+    this.#timeout = timeout
   }
 
   // no-op
@@ -29,9 +29,9 @@ export default class InProcessRunner implements Runner {
 
   async run(event, context) {
     // check if the handler module path exists
-    if (!require.resolve(this._handlerPath)) {
+    if (!require.resolve(this.#handlerPath)) {
       throw new Error(
-        `Could not find handler module '${this._handlerPath}' for function '${this._functionKey}'.`,
+        `Could not find handler module '${this.#handlerPath}' for function '${this.#functionKey}'.`,
       )
     }
 
@@ -43,12 +43,12 @@ export default class InProcessRunner implements Runner {
 
     // lazy load handler with first usage
 
-    const handlerPath = this._handlerPath
-    const { [this._handlerName]: handler } = await import(handlerPath)
+    const handlerPath = this.#handlerPath
+    const { [this.#handlerName]: handler } = await import(handlerPath)
 
     if (typeof handler !== 'function') {
       throw new Error(
-        `offline: handler '${this._handlerName}' in ${this._handlerPath} is not a function`,
+        `offline: handler '${this.#handlerName}' in ${this.#handlerPath} is not a function`,
       )
     }
 
@@ -63,7 +63,7 @@ export default class InProcessRunner implements Runner {
       }
     })
 
-    const executionTimeout = performance.now() + this._timeout * 1000
+    const executionTimeout = performance.now() + this.#timeout * 1000
 
     // attach doc-deprecated functions
     // create new immutable object
@@ -89,7 +89,7 @@ export default class InProcessRunner implements Runner {
       // this only executes when we have an exception caused by synchronous code
       // TODO logging
       console.log(err)
-      throw new Error(`Uncaught error in '${this._functionKey}' handler.`)
+      throw new Error(`Uncaught error in '${this.#functionKey}' handler.`)
     }
 
     // // not a Promise, which is not supported by aws

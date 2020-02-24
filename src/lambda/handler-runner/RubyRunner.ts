@@ -8,16 +8,16 @@ const { cwd } = process
 const { has } = Reflect
 
 export default class RubyRunner implements Runner {
-  private readonly _env: NodeJS.ProcessEnv
-  private readonly _handlerName: string
-  private readonly _handlerPath: string
+  readonly #env: NodeJS.ProcessEnv
+  readonly #handlerName: string
+  readonly #handlerPath: string
 
   constructor(funOptions, env: NodeJS.ProcessEnv) {
     const { handlerName, handlerPath } = funOptions
 
-    this._env = env
-    this._handlerName = handlerName
-    this._handlerPath = handlerPath
+    this.#env = env
+    this.#handlerName = handlerName
+    this.#handlerPath = handlerPath
   }
 
   // no-op
@@ -72,11 +72,11 @@ export default class RubyRunner implements Runner {
       runtime,
       [
         resolve(__dirname, 'invoke.rb'),
-        relative(cwd(), this._handlerPath),
-        this._handlerName,
+        relative(cwd(), this.#handlerPath),
+        this.#handlerName,
       ],
       {
-        env: this._env,
+        env: this.#env,
         input,
         // shell: true,
       },

@@ -10,10 +10,10 @@ import Lambda from '../../lambda/index'
 const { stringify } = JSON
 
 export default class Schedule {
-  private readonly _lambda: Lambda
+  readonly #lambda: Lambda
 
   constructor(lambda: Lambda) {
-    this._lambda = lambda
+    this.#lambda = lambda
   }
 
   private _scheduleEvent(functionKey: string, scheduleEvent) {
@@ -35,7 +35,7 @@ export default class Schedule {
 
     nodeSchedule.scheduleJob(cron, async () => {
       try {
-        const lambdaFunction = this._lambda.get(functionKey)
+        const lambdaFunction = this.#lambda.get(functionKey)
 
         lambdaFunction.setEvent(input)
 

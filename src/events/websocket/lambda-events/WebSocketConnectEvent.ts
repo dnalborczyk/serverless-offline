@@ -8,21 +8,21 @@ import {
 import { Options } from '../../../types'
 
 export default class WebSocketConnectEvent {
-  private readonly _connectionId: string
-  // private readonly _httpsProtocol: any
-  private readonly _rawHeaders: string[]
-  private readonly _url: string
-  // private readonly _websocketPort: number
+  readonly #connectionId: string
+  // readonly #httpsProtocol: any
+  readonly #rawHeaders: string[]
+  readonly #url: string
+  // readonly #websocketPort: number
 
   constructor(connectionId: string, request, options: Options) {
     const { httpsProtocol, websocketPort } = options
     const { rawHeaders, url } = request
 
-    this._connectionId = connectionId
-    // this._httpsProtocol = httpsProtocol
-    this._rawHeaders = rawHeaders
-    this._url = url
-    // this._websocketPort = websocketPort
+    this.#connectionId = connectionId
+    // this.#httpsProtocol = httpsProtocol
+    this.#rawHeaders = rawHeaders
+    this.#url = url
+    // this.#websocketPort = websocketPort
   }
 
   create() {
@@ -33,21 +33,21 @@ export default class WebSocketConnectEvent {
     //   'Sec-WebSocket-Version': '13',
     //   'X-Amzn-Trace-Id': `Root=${createUniqueId()}`,
     //   'X-Forwarded-For': '127.0.0.1',
-    //   'X-Forwarded-Port': String(this._websocketPort),
-    //   'X-Forwarded-Proto': `http${this._httpsProtocol ? 's' : ''}`,
+    //   'X-Forwarded-Port': String(this.#websocketPort),
+    //   'X-Forwarded-Proto': `http${this.#httpsProtocol ? 's' : ''}`,
     // }
 
-    const headers = parseHeaders(this._rawHeaders)
-    const multiValueHeaders = parseMultiValueHeaders(this._rawHeaders)
+    const headers = parseHeaders(this.#rawHeaders)
+    const multiValueHeaders = parseMultiValueHeaders(this.#rawHeaders)
     const multiValueQueryStringParameters = parseMultiValueQueryStringParameters(
-      this._url,
+      this.#url,
     )
-    const queryStringParameters = parseQueryStringParameters(this._url)
+    const queryStringParameters = parseQueryStringParameters(this.#url)
 
     const requestContext = new WebSocketRequestContext(
       'CONNECT',
       '$connect',
-      this._connectionId,
+      this.#connectionId,
     ).create()
 
     return {

@@ -2,10 +2,10 @@
 // http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
 
 export default class LambdaContext {
-  private readonly _context: any
+  readonly #context: any
 
   constructor(functionName: string, memorySize: number) {
-    this._context = {
+    this.#context = {
       awsRequestId: undefined,
       callbackWaitsForEmptyEventLoop: true,
       clientContext: undefined,
@@ -20,14 +20,14 @@ export default class LambdaContext {
   }
 
   setClientContext(clientContext) {
-    this._context.clientContext = clientContext
+    this.#context.clientContext = clientContext
   }
 
   setRequestId(requestId: string) {
-    this._context.awsRequestId = requestId
+    this.#context.awsRequestId = requestId
   }
 
   create() {
-    return this._context
+    return this.#context
   }
 }

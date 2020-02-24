@@ -7,34 +7,34 @@ import { Options } from '../../types'
 import Lambda from '../../lambda/index'
 
 export default class WebSocket {
-  private readonly _httpServer: HttpServer
-  private readonly _webSocketServer: WebSocketServer
+  readonly #httpServer: HttpServer
+  readonly #webSocketServer: WebSocketServer
 
   constructor(serverless: Serverless, options: Options, lambda: Lambda) {
     const webSocketClients = new WebSocketClients(serverless, options, lambda)
 
-    this._httpServer = new HttpServer(options, webSocketClients)
+    this.#httpServer = new HttpServer(options, webSocketClients)
 
     // share server
-    this._webSocketServer = new WebSocketServer(
+    this.#webSocketServer = new WebSocketServer(
       options,
       webSocketClients,
-      this._httpServer.server,
+      this.#httpServer.server,
     )
   }
 
   start() {
     return Promise.all([
-      this._httpServer.start(),
-      this._webSocketServer.start(),
+      this.#httpServer.start(),
+      this.#webSocketServer.start(),
     ])
   }
 
   // stops the server
   stop(timeout: number) {
     return Promise.all([
-      this._httpServer.stop(timeout),
-      this._webSocketServer.stop(),
+      this.#httpServer.stop(timeout),
+      this.#webSocketServer.stop(),
     ])
   }
 
@@ -43,6 +43,6 @@ export default class WebSocket {
       rawWebSocketEventDefinition,
     )
 
-    this._webSocketServer.addRoute(functionKey, webSocketEvent)
+    this.#webSocketServer.addRoute(functionKey, webSocketEvent)
   }
 }

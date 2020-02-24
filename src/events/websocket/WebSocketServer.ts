@@ -6,36 +6,36 @@ import WebSocketClients from './WebSocketClients'
 import { Options } from '../../types'
 
 export default class WebSocketServer {
-  private readonly _options: Options
-  private readonly _server: Server
-  private readonly _webSocketClients: WebSocketClients
+  readonly #options: Options
+  readonly #server: Server
+  readonly #webSocketClients: WebSocketClients
 
   constructor(
     options: Options,
     webSocketClients: WebSocketClients,
     sharedServer,
   ) {
-    this._options = options
+    this.#options = options
 
-    this._server = new Server({
+    this.#server = new Server({
       server: sharedServer,
     })
 
-    this._webSocketClients = webSocketClients
+    this.#webSocketClients = webSocketClients
 
-    this._server.on('connection', (webSocketClient, request) => {
+    this.#server.on('connection', (webSocketClient, request) => {
       console.log('received connection')
 
       const connectionId = createUniqueId()
 
       debugLog(`connect:${connectionId}`)
 
-      this._webSocketClients.addClient(webSocketClient, request, connectionId)
+      this.#webSocketClients.addClient(webSocketClient, request, connectionId)
     })
   }
 
   async start() {
-    const { host, httpsProtocol, websocketPort } = this._options
+    const { host, httpsProtocol, websocketPort } = this.#options
 
     serverlessLog(
       `Offline [websocket] listening on ws${
@@ -48,7 +48,7 @@ export default class WebSocketServer {
   stop() {}
 
   addRoute(functionKey: string, webSocketEvent) {
-    this._webSocketClients.addRoute(functionKey, webSocketEvent.route)
+    this.#webSocketClients.addRoute(functionKey, webSocketEvent.route)
 
     // serverlessLog(`route '${route}'`)
   }

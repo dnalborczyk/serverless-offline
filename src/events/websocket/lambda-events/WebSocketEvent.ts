@@ -1,25 +1,25 @@
 import WebSocketRequestContext from './WebSocketRequestContext'
 
 export default class WebSocketEvent {
-  private readonly _connectionId: string
-  private readonly _payload: any
-  private readonly _route: string
+  readonly #connectionId: string
+  readonly #payload: any
+  readonly #route: string
 
   constructor(connectionId: string, route: string, payload) {
-    this._connectionId = connectionId
-    this._payload = payload
-    this._route = route
+    this.#connectionId = connectionId
+    this.#payload = payload
+    this.#route = route
   }
 
   create() {
     const requestContext = new WebSocketRequestContext(
       'MESSAGE',
-      this._route,
-      this._connectionId,
+      this.#route,
+      this.#connectionId,
     ).create()
 
     return {
-      body: this._payload,
+      body: this.#payload,
       isBase64Encoded: false,
       requestContext,
     }

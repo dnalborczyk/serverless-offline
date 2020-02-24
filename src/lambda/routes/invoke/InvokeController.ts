@@ -4,10 +4,10 @@ import { ClientContext } from '../../../types'
 export type InvocationType = 'Event' | 'RequestResponse'
 
 export default class InvokeController {
-  private readonly _lambda: Lambda
+  readonly #lambda: Lambda
 
   constructor(lambda: Lambda) {
-    this._lambda = lambda
+    this.#lambda = lambda
   }
 
   async invoke(
@@ -16,7 +16,7 @@ export default class InvokeController {
     event,
     clientContext: ClientContext,
   ) {
-    const lambdaFunction = this._lambda.getByFunctionName(functionName)
+    const lambdaFunction = this.#lambda.getByFunctionName(functionName)
 
     lambdaFunction.setClientContext(clientContext)
     lambdaFunction.setEvent(event)

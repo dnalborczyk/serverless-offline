@@ -5,13 +5,13 @@ import { Options } from '../types'
 import Lambda from '../lambda/index'
 
 export default class HttpServer {
-  private readonly _lambda: Lambda
-  private readonly _options: Options
-  private readonly _server: Server
+  readonly #lambda: Lambda
+  readonly #options: Options
+  readonly #server: Server
 
   constructor(options: Options, lambda: Lambda) {
-    this._lambda = lambda
-    this._options = options
+    this.#lambda = lambda
+    this.#options = options
 
     const { host, lambdaPort } = options
 
@@ -20,18 +20,18 @@ export default class HttpServer {
       port: lambdaPort,
     }
 
-    this._server = new Server(serverOptions)
+    this.#server = new Server(serverOptions)
   }
 
   async start() {
     // add routes
-    const route = invokeRoute(this._lambda)
-    this._server.route(route)
+    const route = invokeRoute(this.#lambda)
+    this.#server.route(route)
 
-    const { host, httpsProtocol, lambdaPort } = this._options
+    const { host, httpsProtocol, lambdaPort } = this.#options
 
     try {
-      await this._server.start()
+      await this.#server.start()
     } catch (err) {
       console.error(
         `Unexpected error while starting serverless-offline lambda server on port ${lambdaPort}:`,
@@ -49,7 +49,7 @@ export default class HttpServer {
 
   // stops the server
   stop(timeout: number) {
-    return this._server.stop({
+    return this.#server.stop({
       timeout,
     })
   }

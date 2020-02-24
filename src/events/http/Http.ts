@@ -5,41 +5,41 @@ import { Options } from '../../types'
 import Lambda from '../../lambda/index'
 
 export default class Http {
-  private readonly _httpServer: HttpServer
+  readonly #httpServer: HttpServer
 
   constructor(serverless: Serverless, options: Options, lambda: Lambda) {
-    this._httpServer = new HttpServer(serverless, options, lambda)
+    this.#httpServer = new HttpServer(serverless, options, lambda)
   }
 
   start() {
-    return this._httpServer.start()
+    return this.#httpServer.start()
   }
 
   // stops the server
   stop(timeout: number) {
-    return this._httpServer.stop(timeout)
+    return this.#httpServer.stop(timeout)
   }
 
   createEvent(functionKey: string, rawHttpEventDefinition, handler: string) {
     const httpEvent = new HttpEventDefinition(rawHttpEventDefinition)
 
-    this._httpServer.createRoutes(functionKey, httpEvent, handler)
+    this.#httpServer.createRoutes(functionKey, httpEvent, handler)
   }
 
   createResourceRoutes() {
-    this._httpServer.createResourceRoutes()
+    this.#httpServer.createResourceRoutes()
   }
 
   create404Route() {
-    this._httpServer.create404Route()
+    this.#httpServer.create404Route()
   }
 
   registerPlugins() {
-    return this._httpServer.registerPlugins()
+    return this.#httpServer.registerPlugins()
   }
 
   // TEMP FIXME quick fix to expose gateway server for testing, look for better solution
   getServer() {
-    return this._httpServer.getServer()
+    return this.#httpServer.getServer()
   }
 }

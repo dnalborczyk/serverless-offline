@@ -5,13 +5,13 @@ import serverlessLog from '../../serverlessLog'
 import { Options } from '../../types'
 
 export default class HttpServer {
-  private readonly _options: Options
-  private readonly _server: Server
-  private readonly _webSocketClients: WebSocketClients
+  readonly #options: Options
+  readonly #server: Server
+  readonly #webSocketClients: WebSocketClients
 
   constructor(options: Options, webSocketClients: WebSocketClients) {
-    this._options = options
-    this._webSocketClients = webSocketClients
+    this.#options = options
+    this.#webSocketClients = webSocketClients
 
     const { host, websocketPort } = options
 
@@ -25,21 +25,21 @@ export default class HttpServer {
       },
     }
 
-    this._server = new Server(serverOptions)
+    this.#server = new Server(serverOptions)
   }
 
   async start() {
     // add routes
     const routes = [
-      ...connectionsRoutes(this._webSocketClients),
+      ...connectionsRoutes(this.#webSocketClients),
       catchAllRoute(),
     ]
-    this._server.route(routes)
+    this.#server.route(routes)
 
-    const { host, httpsProtocol, websocketPort } = this._options
+    const { host, httpsProtocol, websocketPort } = this.#options
 
     try {
-      await this._server.start()
+      await this.#server.start()
     } catch (err) {
       console.error(
         `Unexpected error while starting serverless-offline websocket server on port ${websocketPort}:`,
@@ -57,12 +57,12 @@ export default class HttpServer {
 
   // stops the server
   stop(timeout: number) {
-    return this._server.stop({
+    return this.#server.stop({
       timeout,
     })
   }
 
   get server() {
-    return this._server.listener
+    return this.#server.listener
   }
 }

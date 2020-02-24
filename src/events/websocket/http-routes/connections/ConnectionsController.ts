@@ -1,10 +1,10 @@
 import WebSocketClients from '../../WebSocketClients'
 
 export default class ConnectionsController {
-  private readonly _webSocketClients: WebSocketClients
+  readonly #webSocketClients: WebSocketClients
 
   constructor(webSocketClients: WebSocketClients) {
-    this._webSocketClients = webSocketClients
+    this.#webSocketClients = webSocketClients
   }
 
   send(connectionId: string, payload) {
@@ -13,7 +13,7 @@ export default class ConnectionsController {
       return null
     }
 
-    const clientExisted = this._webSocketClients.send(
+    const clientExisted = this.#webSocketClients.send(
       connectionId,
       // payload is a Buffer
       payload.toString('utf-8'),
@@ -23,7 +23,7 @@ export default class ConnectionsController {
   }
 
   remove(connectionId: string) {
-    const clientExisted = this._webSocketClients.close(connectionId)
+    const clientExisted = this.#webSocketClients.close(connectionId)
 
     return clientExisted
   }

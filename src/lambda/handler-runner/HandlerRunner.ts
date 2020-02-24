@@ -10,19 +10,19 @@ import { Runner } from './interfaces'
 import { Options } from '../../types'
 
 export default class HandlerRunner {
-  private readonly _env: NodeJS.ProcessEnv
-  private readonly _funOptions: any
-  private readonly _options: Options
-  private _runner: Runner
+  readonly #env: NodeJS.ProcessEnv
+  readonly #funOptions: any
+  readonly #options: Options
+  #runner: Runner
 
   constructor(funOptions, options: Options, env: NodeJS.ProcessEnv) {
-    this._env = env
-    this._funOptions = funOptions
-    this._options = options
+    this.#env = env
+    this.#funOptions = funOptions
+    this.#options = options
   }
 
   private async _loadRunner() {
-    const { useChildProcesses, useWorkerThreads } = this._options
+    const { useChildProcesses, useWorkerThreads } = this.#options
 
     const {
       functionKey,
@@ -30,7 +30,7 @@ export default class HandlerRunner {
       handlerPath,
       runtime,
       timeout,
-    } = this._funOptions
+    } = this.#funOptions
 
     debugLog(`Loading handler... (${handlerPath})`)
 
@@ -39,7 +39,7 @@ export default class HandlerRunner {
         const { default: ChildProcessRunner } = await import(
           './ChildProcessRunner'
         )
-        return new ChildProcessRunner(this._funOptions, this._env)
+        return new ChildProcessRunner(this.#funOptions, this.#env)
       }
 
       if (useWorkerThreads) {
@@ -49,7 +49,7 @@ export default class HandlerRunner {
         const { default: WorkerThreadRunner } = await import(
           './WorkerThreadRunner'
         )
-        return new WorkerThreadRunner(this._funOptions, this._env)
+        return new WorkerThreadRunner(this.#funOptions, this.#env)
       }
 
       const { default: InProcessRunner } = await import('./InProcessRunner')
@@ -57,19 +57,19 @@ export default class HandlerRunner {
         functionKey,
         handlerPath,
         handlerName,
-        this._env,
+        this.#env,
         timeout,
       )
     }
 
     if (supportedPython.has(runtime)) {
       const { default: PythonRunner } = await import('./PythonRunner')
-      return new PythonRunner(this._funOptions, this._env)
+      return new PythonRunner(this.#funOptions, this.#env)
     }
 
     if (supportedRuby.has(runtime)) {
       const { default: RubyRunner } = await import('./RubyRunner')
-      return new RubyRunner(this._funOptions, this._env)
+      return new RubyRunner(this.#funOptions, this.#env)
     }
 
     // TODO FIXME
@@ -101,14 +101,14 @@ export default class HandlerRunner {
 
   cleanup() {
     // TODO console.log('handler runner cleanup')
-    return this._runner.cleanup()
+    return this.#runner.cleanup()
   }
 
   async run(event, context) {
-    if (this._runner == null) {
-      this._runner = await this._loadRunner()
+    if (this.#runner == null) {
+      this.#runner = await this._loadRunner()
     }
 
-    return this._runner.run(event, context)
+    return this.#runner.run(event, context)
   }
 }
