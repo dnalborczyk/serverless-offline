@@ -103,9 +103,9 @@ exports.asyncFunctionHandler = async function asyncFunctionHandler() {
 // if someone would return a promise, but also defines callback, without using it
 // the handler would not be returning anything
 exports.promiseWithDefinedCallbackHandler = function promiseWithDefinedCallbackHandler(
-  event, // eslint-disable-line no-unused-vars
-  context, // eslint-disable-line no-unused-vars
-  callback, // eslint-disable-line no-unused-vars
+  event, // eslint-disable-line @typescript-eslint/no-unused-vars
+  context, // eslint-disable-line @typescript-eslint/no-unused-vars
+  callback, // eslint-disable-line @typescript-eslint/no-unused-vars
 ) {
   return Promise.resolve({
     body: stringify('Hello Promise!'),

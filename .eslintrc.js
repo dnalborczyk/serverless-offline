@@ -4,6 +4,8 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'eslint-config-airbnb-base',
+    'plugin:@typescript-eslint/recommended',
+    'prettier/@typescript-eslint',
     'plugin:prettier/recommended',
   ],
 
@@ -16,9 +18,9 @@ module.exports = {
     TEST_BASE_URL: true,
   },
 
-  // we need this to have support for dynamic imports
-  // although they are ecma stage 4 proposal -> currently being implemented in eslint
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
+
+  plugins: ['prettier', '@typescript-eslint'],
 
   rules: {
     // overwrite airbnb-base options
@@ -42,5 +44,8 @@ module.exports = {
     'class-methods-use-this': 'off',
     'no-console': 'off',
     'no-restricted-syntax': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    '@typescript-eslint/no-var-requires': 'off',
   },
 }
