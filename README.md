@@ -304,7 +304,7 @@ const lambda = new Lambda({
 All your lambdas can then be invoked in a handler using
 
 ```js
-exports.handler = async function() {
+exports.handler = async function () {
   const params = {
     // FunctionName is composed of: service name - stage - function name, e.g.
     FunctionName: 'myServiceName-dev-invokedHandler',

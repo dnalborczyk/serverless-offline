@@ -18,8 +18,7 @@ import Lambda from '../../lambda/index'
 const { parse, stringify } = JSON
 
 export default class WebSocketClients {
-  readonly #clients: Map<string, WebSocket> &
-    Map<WebSocket, string> = new Map()
+  readonly #clients: Map<string, WebSocket> & Map<WebSocket, string> = new Map()
   readonly #lambda: Lambda
   readonly #options: Options
   readonly #webSocketRoutes: Map<string, any> = new Map()

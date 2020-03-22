@@ -31,7 +31,9 @@ export default class InProcessRunner implements Runner {
     // check if the handler module path exists
     if (!require.resolve(this.#handlerPath)) {
       throw new Error(
-        `Could not find handler module '${this.#handlerPath}' for function '${this.#functionKey}'.`,
+        `Could not find handler module '${this.#handlerPath}' for function '${
+          this.#functionKey
+        }'.`,
       )
     }
 
@@ -48,7 +50,9 @@ export default class InProcessRunner implements Runner {
 
     if (typeof handler !== 'function') {
       throw new Error(
-        `offline: handler '${this.#handlerName}' in ${this.#handlerPath} is not a function`,
+        `offline: handler '${this.#handlerName}' in ${
+          this.#handlerPath
+        } is not a function`,
       )
     }
 
